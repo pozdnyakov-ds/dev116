@@ -2,7 +2,7 @@
     <div>
         <h2><b>{{ $t('admin.title') }}</b></h2>
 
-        <p style="color: red;">{{ $auth.user.name }} <br>
+        <p style="color: red; border: 1px solid red; border-radius: 10px; background-color: bisque; padding: 10px;">{{ $auth.user.name }} => 
             {{ $auth.user.scope }}</p>
 
         <p><b>Пользователи системы </b></p>
@@ -32,9 +32,13 @@ export default {
     // },
     mounted() { 
         this.loading = true;
-        axios.get('/api/users')
+
+        const t = this.$auth.user.token || null;
+        axios.get('/api/users/list?token=' + t)
             .then(response => {
-                this.users = response.data;
+                this.users = response.data && response.data.users ? response.data.users : [];
+                //console.log("USERS: ", this.users);
+
                 this.users.forEach(user => {
                     let statusBoolean = (user.status == 1) ? true : false;
                     this.usersTable.push({
@@ -42,7 +46,7 @@ export default {
                         status: statusBoolean
                     });
                 });
-                console.log('Users: ', this.usersTable);
+                //console.log('Users: ', this.usersTable);
                 this.loading = false;
             })
             .catch(error => {
@@ -57,7 +61,11 @@ export default {
         async updateUserStatus(user) { 
             this.loading = true;
             try {
-                const r = await this.$axios.post('/users/status', user)
+                const token = this.$storage.getUniversal('token');
+                console.log("STATUS: ", user, token);
+
+                this.$axios.setHeader("Authorization", "");
+                const r = await this.$axios.post('/users/status', { user, token })
                     .then(response => {
                         this.error = response.data.error;
                         this.message = response.data.message;

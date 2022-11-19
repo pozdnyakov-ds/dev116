@@ -66,7 +66,7 @@
     </v-app-bar>
 
     <v-navigation-drawer app left absolute temporary v-model="drawer" style="width: 200px;">
-        <v-list-item-group style="padding-top: 10px;">
+        <v-list-item-group>
 
             <v-card v-if="$auth.loggedIn" style="margin: 10px; padding: 10px;">
                 <v-avatar size="100" color="gray" rounded="1" style="margin-bottom: 10px;">
@@ -141,20 +141,20 @@ export default {
     },
     computed: {
         userName() {
-            const name = (this.$storage.getState('user') && this.$storage.getState('user').name)
-                ? this.$storage.getState('user').name
-                : "";
+            const name = (this.$auth.user && this.$auth.user.name)
+                ? this.$auth.user.name
+                : "Гость";
             return name;
         },
         userEmail() {
-            const email = (this.$storage.getState('user') && this.$storage.getState('user').email)
-                ? this.$storage.getState('user').email
+            const email = (this.$auth.user && this.$auth.user.email)
+                ? this.$auth.user.email
                 : "";
             return email;
         },
         userPhoto() {
-            const photo = (this.$storage.getState('user') && this.$storage.getState('user').photo)
-                ? this.$storage.getState('user').photo
+            const photo = (this.$auth.user && this.$auth.user.photo)
+                ? '/avatars/' + this.$auth.user.photo
                 : "/img/user/no-photo.png";
             return photo;
         }
@@ -171,5 +171,9 @@ a {
 .nuxt-link-active {
     text-decoration: none;
     color: #4CAF50;
+}
+
+.v-navigation-drawer {
+    background-color: #eee;
 }
 </style>

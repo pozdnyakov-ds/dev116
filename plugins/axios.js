@@ -1,7 +1,7 @@
 export default function ({ $axios, $auth, $storage, redirect, app }) {
   $axios.interceptors.request.use(
     (config) => {
-      //console.info("AXIOS - Запрос: ", config);
+      $axios.setHeader("Authorization", "");
       return config;
     },
     (error) => {
