@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>Icon/Social/Facebook/Silver</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0 -0.000173913043 20 -0.000173913043 20 39.9998261 0 39.9998261"></polygon>
+    </defs>
+    <g id="Icon/Social/Facebook/Silver" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Page-1" transform="translate(11.000000, 5.000000)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Clip-2"></g>
+            <path d="M19.9996761,12.1313306 L13.0417368,12.1313306 L13.0417368,8.8132378 C13.0417368,7.25260205 14.0101098,6.88856983 14.6915574,6.88856983 L19.5627671,6.88856983 L19.5627671,0.0224692396 L12.505382,-0.000173913043 C6.10499075,-0.000173913043 4.89044886,5.11892036 4.89044886,8.39521037 L4.89044886,12.1313306 L-0.00032388664,12.1313306 L-0.00032388664,19.0984544 L4.89044886,19.0984544 L4.89044886,39.9998261 L13.0417368,39.9998261 L13.0417368,19.0984544 L19.3198587,19.0984544 L19.9996761,12.1313306 Z" id="Fill-1" fill="#BDBDBD" mask="url(#mask-2)"></path>
+        </g>
+    </g>
+</svg>
