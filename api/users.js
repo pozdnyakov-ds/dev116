@@ -1,7 +1,7 @@
 const BASE_URL =
   process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : "http://dev116.ru";
+    ? "https://localhost:3000"
+    : "https://dev116.ru";
 
 const express = require("express");
 const app = express();

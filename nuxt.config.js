@@ -1,4 +1,7 @@
 import { i18n } from "./locales/i18n-nuxt-config";
+import path from "path";
+import fs from "fs";
+import redirectSSL from "redirect-ssl";
 
 export default {
   //target: 'static',
@@ -106,15 +109,28 @@ export default {
     closeOnClick: false,
   },
 
-  server: {
-    port: 3000,
-  },
-
   env: {
     BASE_URL:
       process.env.NODE_ENV === "development"
-        ? "http://localhost:3000"
-        : "http://dev116.ru",
+        ? "https://localhost:3000"
+        : "https://dev116.ru",
+    SSL_FILE:
+      process.env.NODE_ENV === "development" ? "localhost" : "dev116.ru",
+  },
+
+  server: {
+    port: 3000,
+    https: {
+      key:
+        process.env.NODE_ENV === "development"
+          ? fs.readFileSync(path.resolve("ssl/localhost.key"))
+          : fs.readFileSync(path.resolve("ssl/dev116.ru.key")),
+      cert:
+        process.env.NODE_ENV === "development"
+          ? fs.readFileSync(path.resolve("ssl/localhost.crt"))
+          : fs.readFileSync(path.resolve("ssl/dev116.ru.crt")),
+      passphrase: "dev116",
+    },
   },
 
   robots: [
@@ -125,14 +141,15 @@ export default {
   ],
 
   axios: {
+    https: false,
     baseUrl:
       process.env.NODE_ENV === "development"
-        ? "http://localhost:3000"
-        : "http://dev116.ru",
+        ? "https://localhost:3000"
+        : "https://dev116.ru",
     browserBaseURL:
       process.env.NODE_ENV === "development"
-        ? "http://localhost:3000/api/"
-        : "http://dev116.ru/api/",
+        ? "https://localhost:3000/api/"
+        : "https://dev116.ru/api/",
     debug: process.env.NODE_ENV && process.env.NODE_ENV === "development",
     retry: { retries: 3 },
     common: {
@@ -162,7 +179,7 @@ export default {
         },
         tokenRequired: false,
         tokenType: "Bearer",
-        autoLogout: false   //true,
+        autoLogout: false, //true,
       },
     },
     cookie: {
@@ -190,9 +207,10 @@ export default {
     extractCSS: true,
   },
 
-  serverMiddleware: {
-    "/api": "~/api/index.js",
-    "/api/auth": "~/api/auth.js",
-    "/api/users": "~/api/users.js",
-  },
+  serverMiddleware: [
+    "redirect-ssl",
+    { path: "/api", handler: "~/api/index.js" },
+    { path: "/api/auth", handler: "~/api/auth.js" },
+    { path: "/api/users", handler: "~/api/users.js" },
+  ],
 };

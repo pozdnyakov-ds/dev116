@@ -1,4 +1,8 @@
+import https from "https";
+
 export default function ({ $axios, $auth, $storage, redirect, app }) {
+  $axios.defaults.httpsAgent = new https.Agent({ rejectUnauthorized: false });
+
   $axios.interceptors.request.use(
     (config) => {
       $axios.setHeader("Authorization", "");
