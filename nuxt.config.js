@@ -97,7 +97,14 @@ export default {
     "@nuxtjs/vuetify",
     "@nuxtjs/universal-storage",
     ["@nuxtjs/i18n", i18n],
+    "@nuxtjs/recaptcha",
   ],
+
+  recaptcha: {
+    hideBadge: true,
+    siteKey: process.env.CAPTCHA_CLIENT_KEY,
+    version: 3,
+  },
 
   bootstrapVue: {
     icons: true,

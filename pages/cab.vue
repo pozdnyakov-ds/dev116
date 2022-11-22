@@ -108,7 +108,7 @@ export default {
         async submitForm(user) {
             // Обновить токен
             this.$store.dispatch('refreshToken').then(((result) => { 
-                const t = this.$storage.getUniversal('token');  //this.$auth.user.token;
+                const t = this.$storage.getUniversal('token') || null;  //this.$auth.user.token;
                 user.token = t;
 
                 this.$axios.setHeader("Authorization", "");

@@ -1,3 +1,5 @@
+import { $fetch } from "ohmyfetch/node";
+
 const BASE_URL =
   process.env.NODE_ENV === "development"
     ? "https://localhost:3000"
@@ -11,11 +13,12 @@ app.use(express.urlencoded({ extended: false }));
 var cors = require("cors");
 app.use(cors({ origin: [BASE_URL] }));
 
-app.post("/login", function (req, res, next) {
+app.post("/login", async (req, res, next) => {
   const sqlite3 = require("sqlite3").verbose();
 
   var email = req.body.email;
   var password = req.body.password;
+  var captchaToken = req.body.captcha_token || null;
   var token = null;
   var refreshToken = null;
 
@@ -26,6 +29,22 @@ app.post("/login", function (req, res, next) {
     refreshToken: null,
     scope: null,
   };
+
+  // CHECK GOOGLE CAPTCHA by captchaToken
+  if (!captchaToken) {
+    res.send(data);
+    return;
+  }
+  const response = await $fetch(
+    `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.CAPTCHA_SERVER_KEY}&response=${captchaToken}`
+  );
+  console.log("Captcha server side: ", response);
+
+  if (!response.success || response.score < 0.5) {
+    data.error = 1;
+    data.message = "Captcha error";
+    res.send(data);
+  }
 
   var db = new sqlite3.Database(
     `./db/${process.env.DATABASE}.db`,
