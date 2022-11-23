@@ -132,6 +132,7 @@ export default {
         ? {
             key: fs.readFileSync(path.resolve("ssl/localhost.key")),
             cert: fs.readFileSync(path.resolve("ssl/localhost.crt")),
+            passphrase: "dev116",
           }
         : false,
   },
