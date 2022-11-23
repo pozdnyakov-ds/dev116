@@ -127,17 +127,13 @@ export default {
 
   server: {
     port: 3000,
-    https: {
-      key:
-        process.env.NODE_ENV === "development"
-          ? fs.readFileSync(path.resolve("ssl/localhost.key"))
-          : fs.readFileSync(path.resolve("ssl/dev116.ru.key")),
-      cert:
-        process.env.NODE_ENV === "development"
-          ? fs.readFileSync(path.resolve("ssl/localhost.crt"))
-          : fs.readFileSync(path.resolve("ssl/dev116.ru.crt")),
-      passphrase: "dev116",
-    },
+    https:
+      process.env.NODE_ENV === "development"
+        ? {
+            key: fs.readFileSync(path.resolve("ssl/localhost.key")),
+            cert: fs.readFileSync(path.resolve("ssl/localhost.crt")),
+          }
+        : false,
   },
 
   robots: [
@@ -148,7 +144,7 @@ export default {
   ],
 
   axios: {
-    https: false,
+    https: true,
     baseUrl:
       process.env.NODE_ENV === "development"
         ? "https://localhost:3000"
