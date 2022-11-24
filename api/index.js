@@ -2,7 +2,8 @@ const BASE_URL =
   process.env.NODE_ENV === "development"
     ? "https://localhost:3000"
     : "https://dev116.ru";
-console.log("INDEX.JS BASE_URL: ", BASE_URL);
+
+console.log("MODE: ", process.env.NODE_ENV);
 
 const express = require("express");
 
