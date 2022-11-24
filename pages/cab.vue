@@ -113,7 +113,6 @@ export default {
 
                 this.$axios.setHeader("Authorization", "");
                 //delete this.axios.defaults.headers.common["Authorization"];
-
                 const r = this.$axios.post('users/cab', user)
                     .then(response => {
                         this.error = response.data.error;
