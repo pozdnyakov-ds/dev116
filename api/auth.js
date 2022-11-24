@@ -93,10 +93,11 @@ app.post("/login", async (req, res, next) => {
                     $email: email,
                     $password: password,
                   },
-                  function (err, result) {
-                    if (err) {
+                  function (e, result) {
+                    if (e) {
                       data.error = 1;
-                      data.message = "Ошибка записи токена пользователя.";
+                      data.message = "Ошибка записи токена пользователя!";
+                      console.log("Ошибка записи токена пользователя: ", e);
                       db.close();
                       res.send(data);
                       return;
