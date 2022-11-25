@@ -52,9 +52,6 @@
                                 </v-col>
                             </v-row>
 
-                            <!-- <p>DATA: {{ $store.getters['getData'] }}</p> -->
-                            <!-- <p style="margin-top: 20px;"><b>USER:</b> {{ $auth.user }}</p> -->
-
                         </v-container>
                     </v-form>
                 </v-col>
@@ -74,10 +71,10 @@ export default {
     data() {
         return {
             user: {
-                name: this.$auth.user && this.$auth.user.name ? this.$auth.user.name : 'Гость',
-                surname: this.$auth.user && this.$auth.user.surname ? this.$auth.user.surname : '',
-                email: this.$auth.user && this.$auth.user.email ? this.$auth.user.email : 'Ошибка',
-                photo: this.$auth.user && this.$auth.user.photo ? this.$auth.user.photo : null,
+                name: this.$storage.state.user && this.$storage.state.user.name ? this.$storage.state.user.name : 'Гость',
+                surname: this.$storage.state.user && this.$storage.state.user.surname ? this.$storage.state.user.surname : '',
+                email: this.$storage.state.user && this.$storage.state.user.email ? this.$storage.state.user.email : 'Ошибка',
+                photo: this.$storage.state.user && this.$storage.state.user.photo ? this.$storage.state.user.photo : null,
                 password: '',
                 passwordRepeat: '',
                 token: null
@@ -108,11 +105,9 @@ export default {
         async submitForm(user) {
             // Обновить токен
             this.$store.dispatch('refreshToken').then(((result) => { 
-                const t = this.$storage.getUniversal('token') || null;  //this.$auth.user.token;
+                const t = this.$storage.getUniversal('token') || null;  
                 user.token = t;
 
-                this.$axios.setHeader("Authorization", "");
-                //delete this.axios.defaults.headers.common["Authorization"];
                 const r = this.$axios.post('users/cab', user)
                     .then(response => {
                         this.error = response.data.error;

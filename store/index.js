@@ -1,51 +1,52 @@
+import LogoutDialogVue from "~/components/LogoutDialog.vue";
+
 export const state = () => ({
   user: null,
+  loggedIn: false,
 });
 
 export const mutations = {
   setUser(state, user) {
     state.user = user;
+    state.loggedIn = true;
+    this.$storage.setUniversal("token", user.token);
+    this.$storage.setUniversal("refresh_token", user.refresh_token);
   },
-  setComplexUser(state, user) {
-    if (user && user.token) {
-      this.$auth.setUser(user);
-      this.commit("auth/SET", { key: "loggedIn", value: true });
 
-      this.$axios.setToken(user.token);
-      this.$storage.setUniversal("token", user.token);
-      this.$storage.setUniversal("refresh_token", user.refresh_token);
-    }
-  },
   setUserPhoto(state, photo) {
     state.user.photo = photo;
-  }
+  },
+
+  logout(state) {
+    this.$storage.removeUniversal("token");
+    this.$storage.removeUniversal("refresh_token");
+    this.loggedIn = false;
+    this.user = null;
+  },
 };
 
 export const actions = {
   async nuxtServerInit({ commit, dispatch, getters }) {
-    const loggedIn = this.$auth.loggedIn;
+    const loggedIn = this.getters.getLoggedIn;
     const token = this.$storage.getUniversal("token")
       ? this.$storage.getUniversal("token")
       : null;
 
     if (loggedIn && token) {
       try {
-        this.$axios.setHeader("Authorization", "Bearer " + token);
         await this.$axios
-          .get(process.env.BASE_URL + "/api/users/auth")
+          .get(process.env.BASE_URL + "/api/users/auth", { token: token })
           .then((resp) => {
             var user = resp.data.user;
-            if (user) this.$auth.setUser(user);
+            if (user) commit("setUser", user);
           });
       } catch (e) {
         await dispatch("refreshToken");
-        // commit('setComplexUser', this.getters['getUser']);
-        // console.log('Токен обновлен: ', this.$auth.loggedIn);
+        console.log("Токен обновлен: ", this.getters.getLoggedIn);
       }
     } else {
       await dispatch("refreshToken");
-      // commit('setComplexUser', this.getters['getUser']);
-      // console.log('Токен обновлен: ', this.$auth.loggedIn);
+      console.log("Токен обновлен: ", this.getters.getLoggedIn);
     }
   },
 
@@ -55,7 +56,6 @@ export const actions = {
       : null;
 
     try {
-      //console.log("Начало обновления токена: ", refreshToken);
       if (refreshToken) {
         await this.$axios
           .post(process.env.BASE_URL + "/api/auth/refresh/" + refreshToken)
@@ -65,8 +65,7 @@ export const actions = {
               const scope = userData.scope.split(",");
               userData.scope = scope;
               commit("setUser", userData);
-              commit("setComplexUser", this.getters["getUser"]);
-              //console.log("Токен обновлен: ", this.$auth.loggedIn);
+              console.log("Токен обновлен: ", this.getters.getLoggedIn);
             }
           });
       } else {
@@ -81,5 +80,8 @@ export const actions = {
 export const getters = {
   getUser: (state) => {
     return state.user;
+  },
+  getLoggedIn: (state) => {
+    return state.loggedIn;
   },
 };

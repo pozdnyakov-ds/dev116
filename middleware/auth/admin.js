@@ -1,8 +1,10 @@
-export default function ({ $auth, $storage, redirect }) {
-  const scope = $auth.user && $auth.user.scope ? $auth.user.scope : [];
+export default function ({ $storage, redirect }) {
+  const scope =
+    $storage.state.user && $storage.state.user.scope
+      ? $storage.state.user.scope
+      : [];
 
-  if ($auth.loggedIn && scope.includes("admin")) {
-    // if (!$auth.hasScope("admin")) {
+  if ($storage.state.loggedIn && scope.includes("admin")) {
     //...
   } else {
     return redirect("/login");

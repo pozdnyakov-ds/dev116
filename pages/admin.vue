@@ -2,8 +2,8 @@
     <div>
         <h2><b>{{ $t('admin.title') }}</b></h2>
 
-        <p style="color: red; border: 1px solid red; border-radius: 10px; background-color: bisque; padding: 10px;">{{ $auth.user.name }} => 
-            {{ $auth.user.scope }}</p>
+        <p style="color: red; border: 1px solid red; border-radius: 10px; background-color: bisque; padding: 10px;">{{ $storage.state.user.name }} => 
+            {{ $storage.state.user.scope }}</p>
 
         <p><b>Пользователи системы </b></p>
 
@@ -33,7 +33,7 @@ export default {
     mounted() { 
         this.loading = true;
 
-        const t = this.$auth.user.token || null;
+        const t = this.$storage.state.user.token || null;
         axios.get('/api/users/list?token=' + t)
             .then(response => {
                 this.users = response.data && response.data.users ? response.data.users : [];
@@ -62,9 +62,7 @@ export default {
             this.loading = true;
             try {
                 const token = this.$storage.getUniversal('token');
-                console.log("STATUS: ", user, token);
 
-                this.$axios.setHeader("Authorization", "");
                 const r = await this.$axios.post('/users/status', { user, token })
                     .then(response => {
                         this.error = response.data.error;

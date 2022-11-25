@@ -249,7 +249,6 @@ app.post("/reg", function (req, res, next) {
 });
 
 app.post("/refresh/:token", function (req, res, next) {
-  // const r = req.headers.authorization || "";
   // const token = r.split(" ")[1] || null;
   var newToken = null;
   var newRefreshToken = null;

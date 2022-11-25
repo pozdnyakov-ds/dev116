@@ -22,8 +22,6 @@
 </template>
 
 <script>
-import { get } from 'http';
-
 export default {
     props: {
         value: Boolean
@@ -40,11 +38,8 @@ export default {
     },
     methods: {
         async logout() { 
-            await this.$auth.logout();
+            this.$store.commit('logout');
             this.show = false;
-            this.$storage.removeState('user');
-            this.$storage.removeUniversal('token');
-            this.$storage.removeUniversal('refresh_token');
         }
     }
 }

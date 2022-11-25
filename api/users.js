@@ -28,8 +28,7 @@ app.use(cors({ origin: [BASE_URL] }));
 
 // GET USER BY TOKEN
 app.get("/auth", function (req, res, next) {
-  const r = req.headers.authorization || "";
-  const token = r.split(" ")[1] || null;
+  const token = req.body.token || null;
 
   var jwt = require("jsonwebtoken");
   try {
@@ -37,7 +36,7 @@ app.get("/auth", function (req, res, next) {
     //console.log("decodedData: ", decodedData);
   } catch (e) {
     console.log("Token verify error: ", e.response.data);
-    $auth.logout();
+    this.$store.commit("logout");
   }
 
   const sqlite3 = require("sqlite3").verbose();

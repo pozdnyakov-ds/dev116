@@ -46,7 +46,6 @@ export default {
       // { type: 'text/javascript', src: '/vendor/isotope-layout/isotope.pkgd.min.js', body: true },
       // { type: 'text/javascript', src: '/vendor/swiper/swiper-bundle.min.js', body: true },
       // { type: 'text/javascript', src: '/vendor/waypoints/noframework.waypoints.js', body: true },
-      // { type: 'text/javascript', src: '/vendor/php-email-form/validate.js', body: true }
     ],
   },
 
@@ -69,7 +68,6 @@ export default {
     // { src: "/vendor/isotope-layout/isotope.pkgd.min.js", body: true },
     // { src: "/vendor/swiper/swiper-bundle.min.js", body: true },
     // { src: "/vendor/waypoints/noframework.waypoints.js", body: true },
-    // { src: "/vendor/php-email-form/validate.js", body: true }
     // { type: 'text/javascript', src: '@assets/js/main.js', body: true },
   ],
 
@@ -92,7 +90,6 @@ export default {
     "@nuxtjs/pwa",
     // https://go.nuxtjs.dev/content
     "@nuxtjs/robots",
-    "@nuxtjs/auth-next",
     "@nuxtjs/toast",
     "@nuxtjs/vuetify",
     "@nuxtjs/universal-storage",
@@ -158,38 +155,6 @@ export default {
     retry: { retries: 3 },
     common: {
       Accept: "application/json",
-    },
-  },
-
-  auth: {
-    strategies: {
-      local: {
-        autoFetch: false,
-        token: {
-          property: "token",
-          //global: true,
-        },
-        refreshToken: {
-          property: "refresh_token",
-        },
-        user: {
-          property: "user",
-        },
-        endpoints: {
-          login: { url: "/auth/login", method: "post" },
-          refresh: { url: "/auth/refresh", method: "post" },
-          logout: false,
-          user: false, //{ url: "/user/auth", method: "get" },
-        },
-        tokenRequired: false,
-        tokenType: "Bearer",
-        autoLogout: false, //true,
-      },
-    },
-    cookie: {
-      options: {
-        secure: process.env.NODE_ENV && process.env.NODE_ENV === "production",
-      },
     },
   },
 

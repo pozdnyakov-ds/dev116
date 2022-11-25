@@ -35,27 +35,27 @@
                 <v-icon>mdi-magnify</v-icon>
             </v-btn>
 
-            <v-btn icon v-if="$auth.loggedIn">
+            <v-btn icon v-if="$store.state.loggedIn">
                 <nuxt-link to="/admin">
                     <v-icon>mdi-lock</v-icon>
                 </nuxt-link>
             </v-btn>
 
-            <v-btn icon v-if="$auth.loggedIn">
+            <v-btn icon v-if="$store.state.loggedIn">
                 <nuxt-link to="/cab">
                     <v-icon>mdi-account</v-icon>
                 </nuxt-link>
             </v-btn>
 
             <client-only>
-            <v-btn icon v-if="$auth.loggedIn">
+            <v-btn icon v-if="$store.state.loggedIn">
                 <nuxt-link to="#">
                     <v-icon @click="logoutButton">mdi-logout</v-icon>
                 </nuxt-link>
             </v-btn>
             </client-only>
 
-            <v-btn icon v-if="!$auth.loggedIn">
+            <v-btn icon v-if="!$store.state.loggedIn">
                 <nuxt-link to="/login">
                     <v-icon>mdi-login</v-icon>
                 </nuxt-link>
@@ -70,7 +70,7 @@
         <v-navigation-drawer app left absolute temporary v-model="drawer" style="width: 200px;">
             <v-list-item-group>
 
-                <v-card v-if="$auth.loggedIn" style="margin: 10px; padding: 10px;">
+                <v-card v-if="$store.state.loggedIn" style="margin: 10px; padding: 10px;">
                     <v-avatar size="100" color="gray" rounded="1" style="margin-bottom: 10px;">
                         <v-img :src="userPhoto" :alt="userName"></v-img>
                     </v-avatar><br>
@@ -134,29 +134,27 @@ export default {
         }
     },
     methods: {
-        logoutButton() {  //async
+        logoutButton() {
             this.showLogoutDialog = true;
-            //console.log("Try logout...", this.showLogoutDialog);
-            //await this.$auth.logout();
-            //this.$storage.removeUniversal('user');
+            this.$store.commit('logout');
         }
     },
     computed: {
         userName() {
-            const name = (this.$auth.user && this.$auth.user.name)
-                ? this.$auth.user.name
+            const name = ($store.state.user && $store.state.user.name)
+                ? $store.state.user.name
                 : "Гость";
             return name;
         },
         userEmail() {
-            const email = (this.$auth.user && this.$auth.user.email)
-                ? this.$auth.user.email
+            const email = ($store.state.user && $store.state.user.email)
+                ? $store.state.user.email
                 : "";
             return email;
         },
         userPhoto() {
-            const photo = (this.$auth.user && this.$auth.user.photo)
-                ? '/avatars/' + this.$auth.user.photo
+            const photo = ($store.state.user && $store.state.user.photo)
+                ? '/avatars/' + $store.state.user.photo
                 : "/img/user/no-photo.png";
             return photo;
         }
