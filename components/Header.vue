@@ -137,24 +137,25 @@ export default {
         logoutButton() {
             this.showLogoutDialog = true;
             this.$store.commit('logout');
+            this.$router.push('/login');
         }
     },
     computed: {
         userName() {
-            const name = ($store.state.user && $store.state.user.name)
-                ? $store.state.user.name
+            const name = (this.$store.state.user && this.$store.state.user.name)
+                ? this.$store.state.user.name
                 : "Гость";
             return name;
         },
         userEmail() {
-            const email = ($store.state.user && $store.state.user.email)
-                ? $store.state.user.email
+            const email = (this.$store.state.user && this.$store.state.user.email)
+                ? this.$store.state.user.email
                 : "";
             return email;
         },
         userPhoto() {
-            const photo = ($store.state.user && $store.state.user.photo)
-                ? '/avatars/' + $store.state.user.photo
+            const photo = (this.$store.state.user && this.$store.state.user.photo)
+                ? '/avatars/' + this.$store.state.user.photo
                 : "/img/user/no-photo.png";
             return photo;
         }

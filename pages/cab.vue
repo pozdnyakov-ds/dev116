@@ -129,7 +129,7 @@ export default {
             }));
         }
     },
-    middleware: 'auth',
+    middleware: 'auth/admin',
     computed: {
         // url() {
         //     return 'https://randomuser.me/api/portraits/men/20.jpg';

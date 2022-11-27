@@ -25,8 +25,13 @@ export default {
     },
     computed: {
         imagePreviewDefault() {
-            if (!this.imagePreview)
-                this.imagePreview = (this.$store.state.user.photo && this.$store.state.user.photo.length > 0) ? '/avatars/' + this.$store.store.user.photo : '/img/user/no-photo.png';
+            if (!this.imagePreview) {
+                this.imagePreview = (this.$store.state.user
+                    && this.$store.state.user.photo
+                    && this.$store.state.user.photo.length > 0)
+                    ? '/avatars/' + this.$store.state.user.photo
+                    : '/img/user/no-photo.png';
+            }
             return this.imagePreview;
         },
         currentUserPhoto() {
@@ -52,10 +57,7 @@ export default {
                 }
             ).then((data) => {
                 let avatar = data.data.avatar;
-                var u = { ...this.$store.state.user }
-                u.photo = avatar;
-                
-                this.$store.commit('setUser', u);
+                this.$store.commit('setUserPhoto', avatar);
                                 
                 this.$toast.success('Изображение успешно обновлено');
                 this.canSave = false;

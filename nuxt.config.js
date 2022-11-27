@@ -1,7 +1,6 @@
 import { i18n } from "./locales/i18n-nuxt-config";
 import path from "path";
 import fs from "fs";
-import redirectSSL from "redirect-ssl";
 
 export default {
   //target: 'static',

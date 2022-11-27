@@ -69,26 +69,27 @@ export default {
 	methods: {
 		async submitForm(userInfo) {
 			try {
-				const token = await this.$recaptcha.execute('login');
+				const captchaToken = await this.$recaptcha.execute('login');
+				console.log("Captcha token: ", captchaToken); 
+
 				try {
 					await this.$axios.post('/auth/login', {
-						data: {
-							email: userInfo.email,
-							password: userInfo.password,
-							captcha_token: token
-						}
+						email: userInfo.email,
+						password: userInfo.password,
+						captcha_token: captchaToken
 					}).then(async (response) => {
 						this.error = response.data.error;
 						this.message = response.data.message;
+						var token = response.data.token;
 
-						if (response.data.error == 0 && response.data.token && response.data.token.length > 0) {
+						if (response.data.error == 0 && token && token.length > 0) {
 							try {
-								this.$axios.get('/users/auth').then((resp) => {
+								this.$axios.get('/users/auth?token=' + token)
+									.then((resp) => {
 									var user = resp.data.user;
 
 									let scope = user.scope.split(',') || [];
 									user.scope = scope;
-									console.log("USER LOGIN DATA: ", user);
 									
 									// Set auth user
 									this.$store.commit('setUser', user);
