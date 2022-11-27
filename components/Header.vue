@@ -136,8 +136,7 @@ export default {
     methods: {
         logoutButton() {
             this.showLogoutDialog = true;
-            this.$store.commit('logout');
-            this.$router.push('/login');
+            //this.$router.push('/login');
         }
     },
     computed: {

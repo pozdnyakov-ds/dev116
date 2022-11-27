@@ -4,7 +4,6 @@
 		
 		<v-form v-model="valid">
 			<v-container>
-
 				<p style="text-align: center;"><b>Войти в панель управления</b></p>
 
 				<div class="input-group mb-3">
@@ -84,8 +83,9 @@ export default {
 
 						if (response.data.error == 0 && token && token.length > 0) {
 							try {
-								this.$axios.get('/users/auth?token=' + token)
+								await this.$axios.get('/users/auth?token=' + token)
 									.then((resp) => {
+									console.log("USER/AUTH", resp.data.user);	
 									var user = resp.data.user;
 
 									let scope = user.scope.split(',') || [];

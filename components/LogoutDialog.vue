@@ -40,6 +40,7 @@ export default {
         async logout() { 
             this.$store.commit('logout');
             this.show = false;
+            this.$router.push('/login');
         }
     }
 }

@@ -7,10 +7,12 @@ export const state = () => ({
 
 export const mutations = {
   setUser(state, user) {
+    console.log("setUser data: ", user);
     state.user = user;
     state.loggedIn = true;
     this.$storage.setUniversal("token", user.token);
     this.$storage.setUniversal("refresh_token", user.refresh_token);
+    console.log("STATE User: ", state.user);
   },
 
   setUserPhoto(state, photo) {

@@ -66,15 +66,14 @@
 </template>
 
 <script>
-// import { mapGetters } from 'vuex';
 export default {
     data() {
         return {
             user: {
-                name: this.$storage.state.user && this.$storage.state.user.name ? this.$storage.state.user.name : 'Гость',
-                surname: this.$storage.state.user && this.$storage.state.user.surname ? this.$storage.state.user.surname : '',
-                email: this.$storage.state.user && this.$storage.state.user.email ? this.$storage.state.user.email : 'Ошибка',
-                photo: this.$storage.state.user && this.$storage.state.user.photo ? this.$storage.state.user.photo : null,
+                name: this.$store.state.user && this.$store.state.user.name ? this.$store.state.user.name : 'Гость',
+                surname: this.$store.state.user && this.$store.state.user.surname ? this.$store.state.user.surname : '',
+                email: this.$store.state.user && this.$store.state.user.email ? this.$store.state.user.email : 'Ошибка', 
+                photo: this.$store.state.user && this.$store.state.user.photo ? this.$store.state.user.photo : null,
                 password: '',
                 passwordRepeat: '',
                 token: null
@@ -112,8 +111,8 @@ export default {
                     .then(response => {
                         this.error = response.data.error;
                         this.message = response.data.message;
+                        console.log("MESSAGE FROM API: ", response.data);
 
-                        //console.log("MESSAGE FROM API: ", response.data);
                         if (response.data.error == 0) {
                             this.$toast.success('Пользователь обновлен');
                             //this.$router.push('/cab');
@@ -129,7 +128,7 @@ export default {
             }));
         }
     },
-    middleware: 'auth/admin',
+    middleware: 'auth/user',
     computed: {
         // url() {
         //     return 'https://randomuser.me/api/portraits/men/20.jpg';
@@ -138,7 +137,7 @@ export default {
             return {
                 meta: [{ name: 'robots', content: 'noindex,nofollow' }]
             }
-        }
+        },
     },
     mounted() {
         //this.$validator.validate();

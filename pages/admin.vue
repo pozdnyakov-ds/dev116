@@ -2,8 +2,8 @@
     <div>
         <h2><b>{{ $t('admin.title') }}</b></h2>
 
-        <p style="color: red; border: 1px solid red; border-radius: 10px; background-color: bisque; padding: 10px;">{{ $storage.state.user.name }} => 
-            {{ $storage.state.user.scope }}</p>
+        <p style="color: red; border: 1px solid red; border-radius: 10px; background-color: bisque; padding: 10px;">{{ $store.state.user.name }} => 
+            {{ $store.state.user.scope }}</p>
 
         <p><b>Пользователи системы </b></p>
 
@@ -33,7 +33,7 @@ export default {
     mounted() { 
         this.loading = true;
 
-        const t = this.$storage.state.user.token || null;
+        const t = this.$store.state.user.token || null;
         axios.get('/api/users/list?token=' + t)
             .then(response => {
                 this.users = response.data && response.data.users ? response.data.users : [];
