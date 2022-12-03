@@ -77,7 +77,7 @@ export default {
         async submitForm(userInfo) {
             try {
                 this.$axios.setHeader("Authorization", "");
-                const r = await this.$axios.post('/reset', userInfo)
+                const r = await this.$axios.post('/auth/reset', userInfo)
                     .then(response => {
                         this.error = response.data.error;
                         this.message = response.data.message;

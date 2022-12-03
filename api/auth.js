@@ -197,7 +197,7 @@ app.post("/reg", function (req, res, next) {
                       return;
                     } else {
                       var content = `<b>Ссылка для подтверждения регистрации (действительна 24 часа):</b> 
-                          <a target=_blank href="${BASE_URL}/api/submit?email=${email}&token=${emailToken}">Подтвердить</a><br>`;
+                          <a target=_blank href="${BASE_URL}/api/auth/submit?email=${email}&token=${emailToken}">Подтвердить</a><br>`;
 
                       const info = transporter.sendMail(
                         {
@@ -502,7 +502,7 @@ app.post("/reset", function (req, res, next) {
   );
 });
 
-app.get("/activation", function (req, res, next) {
+app.get("/submit", function (req, res, next) {
   const sqlite3 = require("sqlite3").verbose();
 
   var data = {
