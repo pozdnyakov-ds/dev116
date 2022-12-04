@@ -88,12 +88,28 @@ export default {
     // https://go.nuxtjs.dev/pwa
     "@nuxtjs/pwa",
     // https://go.nuxtjs.dev/content
-    "@nuxtjs/robots",
     "@nuxtjs/toast",
     "@nuxtjs/vuetify",
     "@nuxtjs/universal-storage",
     ["@nuxtjs/i18n", i18n],
     "@nuxtjs/recaptcha",
+    [
+      "nuxt-seo-module",
+      {
+        robots: {
+          UserAgent: "*",
+          CrawlDelay: "",
+          Disallow: "/",
+          Allow: "",
+          Sitemap: "",
+        },
+        sitemap: [
+          {
+            generate: true,
+          },
+        ],
+      },
+    ],
   ],
 
   recaptcha: {
@@ -133,12 +149,12 @@ export default {
         : false,
   },
 
-  robots: [
-    {
-      UserAgent: "*",
-      Disallow: "/",
-    },
-  ],
+  // robots: [
+  //   {
+  //     UserAgent: "*",
+  //     Disallow: "/",
+  //   },
+  // ],
 
   axios: {
     https: true,
