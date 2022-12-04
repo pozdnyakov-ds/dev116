@@ -81,7 +81,7 @@ app.post("/login", async (req, res, next) => {
                   { id: row.id, email: email, scope: data.scope },
                   process.env.REFRESH_TOKEN_SECRET,
                   {
-                    expiresIn: "60d",
+                    expiresIn: "30d",
                   }
                 );
 
@@ -132,12 +132,12 @@ app.post("/reg", function (req, res, next) {
 
   const nodemailer = require("nodemailer");
   const transporter = nodemailer.createTransport({
-    host: "smtp.timeweb.ru",
-    port: 465,
-    secure: true,
+    host: env.process.MAIL_HOST,
+    port: env.process.MAIL_PORT,
+    secure: env.process.MAIL_SECURE,
     auth: {
-      user: "info@dev116.ru",
-      pass: "Info9201",
+      user: MAIL_AUTH_USER,
+      pass: MAIL_AUTH_PASS,
     },
   });
 
@@ -201,19 +201,18 @@ app.post("/reg", function (req, res, next) {
 
                       const info = transporter.sendMail(
                         {
-                          from: "Dev116 <info@dev116.ru>",
+                          from: `Dev116 <${env.process.MAIL_AUTH_USER}>`,
                           to: email,
                           subject:
                             "Подтверждение регистрации на проекте Dev116.ru",
                           text: ``,
                           html: content,
-                          sender: "info@dev116.ru",
-                          replyTo: "info@dev116.ru",
+                          sender: env.process.MAIL_AUTH_USER,
+                          replyTo: env.process.MAIL_AUTH_USER,
                           dkim: {
-                            domainName: "dev116.ru",
-                            keySelector: "2022",
-                            privateKey:
-                              "-----BEGIN RSA PRIVATE KEY-----MIICXgIBAAKBgQC2RKmxTvUs0/wkAntEU+hRh4L6PyAf54M9e66y/21NgTH2dwbzHQfvot8N49lAfUtcLqr6bAJRaOzjzUuPmjm/MCWcY9N/to26CKPHYS5hnucl5iohEIONn2kw+hEC399kOgxQAQRm5RZGSdM0QS0GfzUAQ30emLWRLjhDgDDSDwIDAQABAoGBAJIPeAS0h1jDD50zt+BLdTJQa69qAq5OcidFA/xBIDApxgYB4DnWG9P3KtQQsLozLb7TTwSapUjj0mHC1DhhmL+4qRaoAI5BY35Ionwh5w8xgQatQkIo4iPFmQt3vzPXAdIlYCMemSUCjfnfP82lgcE7Oe/G4GQLKdmXAPEpw3CxAkEA4X++yasOrmubOiQN2DBK8UkFHJbV+yGi/NZ+n5GDIhu1VmAW80VUHsSqLzG4IUF8ZWi25KSiVaAD9UUtLjsI5QJBAM7r++qXZOJ+VA4litrW81rMbOWR7mdSWpgjOJMMh9T6fxMAwR4Qor19uNuTWqjbpRnP0hPJd6cmGhKJJ0A0Q+MCQQC9Ym1YsBpPcL5YsSkTdVOrm5j4btHd7V0WngqQd0Q75CuDFIaR35sLkD4iDs7G11njTXO1SXOxGAfa+TM9zYTlAkBkNEFdfI09ZcHcy+9vRLK6oM6HaeESpf37OOs3wtSwndIV6MKchZ/Ztd1kb/pyVVOhqVNpg6HvDvOHUGXyoJzTAkEAkQIMfXPos3Ky1EnnQFjj4muahIG86iHcGb+Hsnc/onL4D+uBO42yernXMcW8IuJq8nTxLSSmnCRhw+7f4TtPzg==-----END RSA PRIVATE KEY-----",
+                            domainName: env.process.MAIL_DOMAIN_NAME,
+                            keySelector: env.process.MAIL_KEY_SELECTOR,
+                            privateKey: env.process.MAIL_PRIVATE_KEY,
                           },
                         },
                         function (error, info) {
@@ -248,20 +247,18 @@ app.post("/reg", function (req, res, next) {
   );
 });
 
-app.post("/refresh/:token", function (req, res, next) {
-  // const token = r.split(" ")[1] || null;
+app.post("/refresh", function (req, res, next) {
+  const r = req.headers.authorization || "";
+  const token = r.split(" ")[1] || null;
+
   var newToken = null;
   var newRefreshToken = null;
   var user = null;
 
-  const token = req.params.token;
-  //console.log("API REFRESH - Входящий параметр", token);
-
-  var decodedData = null;
-
   var jwt = require("jsonwebtoken");
   try {
-    decodedData = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+    var decodedData =
+      jwt.verify(token, process.env.REFRESH_TOKEN_SECRET) || null;
     //console.log("REFRESH decodedData: ", decodedData);
   } catch (e) {
     //console.log("REFRESH - Ошибка проверки рефреш-токена: ", e);
@@ -294,7 +291,7 @@ app.post("/refresh/:token", function (req, res, next) {
               { id: user.id, email: user.email, scope: user.scope },
               process.env.TOKEN_SECRET,
               {
-                expiresIn: "30m",
+                expiresIn: "1m",
               }
             );
 
@@ -337,12 +334,12 @@ app.post("/forgot", function (req, res, next) {
 
   const nodemailer = require("nodemailer");
   const transporter = nodemailer.createTransport({
-    host: "smtp.timeweb.ru",
-    port: 465,
-    secure: true,
+    host: env.process.MAIL_HOST,
+    port: env.process.MAIL_PORT,
+    secure: env.process.MAIL_SECURE,
     auth: {
-      user: "info@dev116.ru",
-      pass: "Info9201",
+      user: MAIL_AUTH_USER,
+      pass: MAIL_AUTH_PASS,
     },
   });
 
@@ -382,18 +379,17 @@ app.post("/forgot", function (req, res, next) {
 
               const info = transporter.sendMail(
                 {
-                  from: "Dev116 <info@dev116.ru>",
+                  from: `Dev116 <${env.process.MAIL_AUTH_USER}>`,
                   to: email,
                   subject: "Подтверждение сброса пароля на проекте Dev116.ru",
                   text: ``,
                   html: content,
-                  sender: "info@dev116.ru",
-                  replyTo: "info@dev116.ru",
+                  sender: env.process.MAIL_AUTH_USER,
+                  replyTo: env.process.MAIL_AUTH_USER,
                   dkim: {
-                    domainName: "dev116.ru",
-                    keySelector: "2022",
-                    privateKey:
-                      "-----BEGIN RSA PRIVATE KEY-----MIICXgIBAAKBgQC2RKmxTvUs0/wkAntEU+hRh4L6PyAf54M9e66y/21NgTH2dwbzHQfvot8N49lAfUtcLqr6bAJRaOzjzUuPmjm/MCWcY9N/to26CKPHYS5hnucl5iohEIONn2kw+hEC399kOgxQAQRm5RZGSdM0QS0GfzUAQ30emLWRLjhDgDDSDwIDAQABAoGBAJIPeAS0h1jDD50zt+BLdTJQa69qAq5OcidFA/xBIDApxgYB4DnWG9P3KtQQsLozLb7TTwSapUjj0mHC1DhhmL+4qRaoAI5BY35Ionwh5w8xgQatQkIo4iPFmQt3vzPXAdIlYCMemSUCjfnfP82lgcE7Oe/G4GQLKdmXAPEpw3CxAkEA4X++yasOrmubOiQN2DBK8UkFHJbV+yGi/NZ+n5GDIhu1VmAW80VUHsSqLzG4IUF8ZWi25KSiVaAD9UUtLjsI5QJBAM7r++qXZOJ+VA4litrW81rMbOWR7mdSWpgjOJMMh9T6fxMAwR4Qor19uNuTWqjbpRnP0hPJd6cmGhKJJ0A0Q+MCQQC9Ym1YsBpPcL5YsSkTdVOrm5j4btHd7V0WngqQd0Q75CuDFIaR35sLkD4iDs7G11njTXO1SXOxGAfa+TM9zYTlAkBkNEFdfI09ZcHcy+9vRLK6oM6HaeESpf37OOs3wtSwndIV6MKchZ/Ztd1kb/pyVVOhqVNpg6HvDvOHUGXyoJzTAkEAkQIMfXPos3Ky1EnnQFjj4muahIG86iHcGb+Hsnc/onL4D+uBO42yernXMcW8IuJq8nTxLSSmnCRhw+7f4TtPzg==-----END RSA PRIVATE KEY-----",
+                    domainName: env.process.MAIL_DOMAIN_NAME,
+                    keySelector: env.process.MAIL_KEY_SELECTOR,
+                    privateKey: env.process.MAIL_PRIVATE_KEY,
                   },
                 },
                 function (error, info) {
@@ -424,12 +420,12 @@ app.post("/reset", function (req, res, next) {
 
   const nodemailer = require("nodemailer");
   const transporter = nodemailer.createTransport({
-    host: "smtp.timeweb.ru",
-    port: 465,
-    secure: true,
+    host: env.process.MAIL_HOST,
+    port: env.process.MAIL_PORT,
+    secure: env.process.MAIL_SECURE,
     auth: {
-      user: "info@dev116.ru",
-      pass: "Info9201",
+      user: MAIL_AUTH_USER,
+      pass: MAIL_AUTH_PASS,
     },
   });
 
@@ -465,18 +461,17 @@ app.post("/reset", function (req, res, next) {
 
               const info = transporter.sendMail(
                 {
-                  from: "Dev116 <info@dev116.ru>",
+                  from: `Dev116 <${env.process.MAIL_AUTH_USER}>`,
                   to: email,
                   subject: "Подтверждение смены пароля на проекте Dev116.ru",
                   text: ``,
                   html: content,
-                  sender: "info@dev116.ru",
-                  replyTo: "info@dev116.ru",
+                  sender: env.process.MAIL_AUTH_USER,
+                  replyTo: env.process.MAIL_AUTH_USER,
                   dkim: {
-                    domainName: "dev116.ru",
-                    keySelector: "2022",
-                    privateKey:
-                      "-----BEGIN RSA PRIVATE KEY-----MIICXgIBAAKBgQC2RKmxTvUs0/wkAntEU+hRh4L6PyAf54M9e66y/21NgTH2dwbzHQfvot8N49lAfUtcLqr6bAJRaOzjzUuPmjm/MCWcY9N/to26CKPHYS5hnucl5iohEIONn2kw+hEC399kOgxQAQRm5RZGSdM0QS0GfzUAQ30emLWRLjhDgDDSDwIDAQABAoGBAJIPeAS0h1jDD50zt+BLdTJQa69qAq5OcidFA/xBIDApxgYB4DnWG9P3KtQQsLozLb7TTwSapUjj0mHC1DhhmL+4qRaoAI5BY35Ionwh5w8xgQatQkIo4iPFmQt3vzPXAdIlYCMemSUCjfnfP82lgcE7Oe/G4GQLKdmXAPEpw3CxAkEA4X++yasOrmubOiQN2DBK8UkFHJbV+yGi/NZ+n5GDIhu1VmAW80VUHsSqLzG4IUF8ZWi25KSiVaAD9UUtLjsI5QJBAM7r++qXZOJ+VA4litrW81rMbOWR7mdSWpgjOJMMh9T6fxMAwR4Qor19uNuTWqjbpRnP0hPJd6cmGhKJJ0A0Q+MCQQC9Ym1YsBpPcL5YsSkTdVOrm5j4btHd7V0WngqQd0Q75CuDFIaR35sLkD4iDs7G11njTXO1SXOxGAfa+TM9zYTlAkBkNEFdfI09ZcHcy+9vRLK6oM6HaeESpf37OOs3wtSwndIV6MKchZ/Ztd1kb/pyVVOhqVNpg6HvDvOHUGXyoJzTAkEAkQIMfXPos3Ky1EnnQFjj4muahIG86iHcGb+Hsnc/onL4D+uBO42yernXMcW8IuJq8nTxLSSmnCRhw+7f4TtPzg==-----END RSA PRIVATE KEY-----",
+                    domainName: env.process.MAIL_DOMAIN_NAME,
+                    keySelector: env.process.MAIL_KEY_SELECTOR,
+                    privateKey: env.process.MAIL_PRIVATE_KEY,
                   },
                 },
                 function (error, info) {

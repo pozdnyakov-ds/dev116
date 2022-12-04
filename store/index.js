@@ -2,6 +2,7 @@ import LogoutDialogVue from "~/components/LogoutDialog.vue";
 
 export const state = () => ({
   user: null,
+  token: null,
   loggedIn: false,
 });
 
@@ -28,7 +29,11 @@ export const mutations = {
 };
 
 export const actions = {
-  async nuxtServerInit({ commit, dispatch, getters }) {
+  async nuxtServerInit({ dispatch }) {
+    await dispatch("autoLogin");
+  },
+
+  async autoLogin({ commit, dispatch }) {
     const loggedIn = this.getters.getLoggedIn;
     const token = this.$storage.getUniversal("token")
       ? this.$storage.getUniversal("token")
@@ -36,8 +41,13 @@ export const actions = {
 
     if (loggedIn && token) {
       try {
+        const headers = {
+          Authorization: "Bearer " + token,
+        };
         await this.$axios
-          .get(process.env.BASE_URL + "/api/users/auth", { token: token })
+          .get(process.env.BASE_URL + "/api/users/auth", {
+            headers: headers,
+          })
           .then((resp) => {
             var user = resp.data.user;
             if (user) commit("setUser", user);
@@ -59,8 +69,13 @@ export const actions = {
 
     try {
       if (refreshToken) {
+        const headers = {
+          Authorization: "Bearer " + refreshToken,
+        };
         await this.$axios
-          .post(process.env.BASE_URL + "/api/auth/refresh/" + refreshToken)
+          .post(process.env.BASE_URL + "/api/auth/refresh", {
+            headers: headers,
+          })
           .then((resp) => {
             var userData = resp.data.user;
             if (userData && userData.token) {

@@ -83,7 +83,12 @@ export default {
 
 						if (response.data.error == 0 && token && token.length > 0) {
 							try {
-								await this.$axios.get('/users/auth?token=' + token)
+								const headers = {
+									'Authorization': 'Bearer ' + token
+								}
+								await this.$axios.get('/users/auth', {
+										headers: headers
+									})
 									.then((resp) => {
 									console.log("USER/AUTH", resp.data.user);	
 									var user = resp.data.user;

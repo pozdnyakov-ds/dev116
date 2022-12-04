@@ -28,7 +28,9 @@ app.use(cors({ origin: [BASE_URL] }));
 
 // GET USER BY TOKEN
 app.get("/auth", function (req, res, next) {
-  const token = req.query.token || null;
+  const r = req.headers.authorization || "";
+  const token = r.split(" ")[1] || null;
+  console.log("AUTH TOKEN: ", token);
 
   var jwt = require("jsonwebtoken");
   try {
