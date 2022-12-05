@@ -12,9 +12,9 @@
 				</div>
 
 				<div class="input-group mb-3">
-					<v-text-field v-model="userInfo.password" label="Пароль" :type="showPassword ? 'text' : 'password'"
+					<v-text-field @keyup.enter="submitForm(userInfo)" v-model="userInfo.password" label="Пароль" :type="showPassword ? 'text' : 'password'"
 						:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append="showPassword = !showPassword"
-						counter=16 outlined
+						counter=16 outlined 
 						:rules="[required('Пароль'), minLength('Пароль', 3), maxLength('Пароль', 16)]" />
 				</div>
 
@@ -31,7 +31,7 @@
 				</div>
 
 				<div v-if="message" class="row" style="text-align: center;">
-					<div class='col-12'><span style="color: red; font-size: 90%;">{{ message }}</span></div>
+					<div class='col-12'><span :style="messageStyle">{{ message }}</span></div>
 				</div>
 
 			</v-container>
@@ -49,6 +49,7 @@ export default {
 			valid: false,
 			error: 0,
 			message: '',
+			messageColor: "#333",
 			showPassword: false,
 			required(propertyType) {
 				return v => v && v.length > 0 || `Нужно указать ${propertyType}`
@@ -69,7 +70,6 @@ export default {
 		async submitForm(userInfo) {
 			try {
 				const captchaToken = await this.$recaptcha.execute('login');
-				console.log("Captcha token: ", captchaToken); 
 
 				try {
 					await this.$axios.post('/auth/login', {
@@ -96,7 +96,6 @@ export default {
 									user.scope = scope;
 									
 									// Set auth user
-									// console.log('LOGGED USER: ', user);
 									this.$store.commit('setUser', user);
 									
 									this.$toast.success('Успешный вход');
@@ -126,9 +125,13 @@ export default {
 		}
 	},
 	async mounted() {
-		//console.log(this.$route.query);
+		if (this.$route.query && this.$route.query.error == '0' && this.$route.query.message) {
+			this.message = this.$route.query.message;
+			this.messageStyle = "color: green; font-size: 90%;";
+		}
 		if (this.$route.query && this.$route.query.error == '1' && this.$route.query.message) {
 			this.message = this.$route.query.message;
+			this.messageStyle = "color: red; font-size: 90%;";
 		}
 
 		try {

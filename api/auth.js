@@ -1,5 +1,16 @@
 import { $fetch } from "ohmyfetch/node";
 
+async function captchaCheck(token) {
+  if (!token) {
+    return false;
+  }
+  const response = await $fetch(
+    `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.CAPTCHA_SERVER_KEY}&response=${token}`
+  );
+  console.log("CaptchaCheck Result: ", response.success, response.score);
+  return response.success && response.score >= process.env.CAPTCHA_SCORE;
+}
+
 const BASE_URL =
   process.env.NODE_ENV === "development"
     ? "https://localhost:3000"
@@ -31,16 +42,7 @@ app.post("/login", async (req, res, next) => {
   };
 
   // CHECK GOOGLE CAPTCHA by captchaToken
-  if (!captchaToken) {
-    res.send(data);
-    return;
-  }
-  const response = await $fetch(
-    `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.CAPTCHA_SERVER_KEY}&response=${captchaToken}`
-  );
-  console.log("Captcha server side: ", response);
-
-  if (!response.success || response.score < 0.5) {
+  if (!captchaCheck(captchaToken)) {
     data.error = 1;
     data.message = "Captcha error";
     res.send(data);
@@ -74,7 +76,7 @@ app.post("/login", async (req, res, next) => {
                   { id: row.id, email: email, scope: data.scope },
                   process.env.TOKEN_SECRET,
                   {
-                    expiresIn: "1m", // 30m
+                    expiresIn: "30m",
                   }
                 );
                 refreshToken = jwt.sign(
@@ -127,17 +129,17 @@ app.post("/login", async (req, res, next) => {
   );
 });
 
-app.post("/reg", function (req, res, next) {
+app.post("/register", async (req, res, next) => {
   const sqlite3 = require("sqlite3").verbose();
 
   const nodemailer = require("nodemailer");
   const transporter = nodemailer.createTransport({
-    host: env.process.MAIL_HOST,
-    port: env.process.MAIL_PORT,
-    secure: env.process.MAIL_SECURE,
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
+    secure: process.env.MAIL_SECURE,
     auth: {
-      user: MAIL_AUTH_USER,
-      pass: MAIL_AUTH_PASS,
+      user: process.env.MAIL_AUTH_USER,
+      pass: process.env.MAIL_AUTH_PASS,
     },
   });
 
@@ -145,11 +147,19 @@ app.post("/reg", function (req, res, next) {
   var email = req.body.email;
   var uniqueEmail = true;
   var password = req.body.password;
+  var captchaToken = req.body.captcha_token || null;
   var id = Math.random().toString(32).slice(2);
   var data = {
     error: 0,
     message: "",
   };
+
+  // CHECK GOOGLE CAPTCHA by captchaToken
+  if (!captchaCheck(captchaToken)) {
+    data.error = 1;
+    data.message = "Captcha error";
+    res.send(data);
+  }
 
   var jwt = require("jsonwebtoken");
   var emailToken = jwt.sign(
@@ -187,8 +197,8 @@ app.post("/reg", function (req, res, next) {
 
               if (uniqueEmail) {
                 db.run(
-                  "INSERT INTO users (id, name, email, password, email_token) VALUES (?,?,?,?,?)",
-                  [id, name, email, password, emailToken],
+                  "INSERT INTO users (id, name, email, password, email_token, scope) VALUES (?,?,?,?,?,?)",
+                  [id, name, email, password, emailToken, "user"],
                   function (err, result) {
                     if (err) {
                       data.error = 1;
@@ -196,23 +206,23 @@ app.post("/reg", function (req, res, next) {
                       res.send(data);
                       return;
                     } else {
-                      var content = `<b>Ссылка для подтверждения регистрации (действительна 24 часа):</b> 
+                      var content = `<b>Ссылка для подтверждения регистрации (действительна 24 часа):</b>
                           <a target=_blank href="${BASE_URL}/api/auth/submit?email=${email}&token=${emailToken}">Подтвердить</a><br>`;
 
                       const info = transporter.sendMail(
                         {
-                          from: `Dev116 <${env.process.MAIL_AUTH_USER}>`,
+                          from: `Dev116 <${process.env.MAIL_AUTH_USER}>`,
                           to: email,
                           subject:
                             "Подтверждение регистрации на проекте Dev116.ru",
                           text: ``,
                           html: content,
-                          sender: env.process.MAIL_AUTH_USER,
-                          replyTo: env.process.MAIL_AUTH_USER,
+                          sender: process.env.MAIL_AUTH_USER,
+                          replyTo: process.env.MAIL_AUTH_USER,
                           dkim: {
-                            domainName: env.process.MAIL_DOMAIN_NAME,
-                            keySelector: env.process.MAIL_KEY_SELECTOR,
-                            privateKey: env.process.MAIL_PRIVATE_KEY,
+                            domainName: process.env.MAIL_DOMAIN_NAME,
+                            keySelector: process.env.MAIL_KEY_SELECTOR,
+                            privateKey: process.env.MAIL_PRIVATE_KEY,
                           },
                         },
                         function (error, info) {
@@ -247,7 +257,7 @@ app.post("/reg", function (req, res, next) {
   );
 });
 
-app.get("/refresh", function (req, res, next) {
+app.get("/refresh", async (req, res, next) => {
   const r = req.headers.authorization || "";
   const token = r.split(" ")[1] || null;
 
@@ -328,25 +338,33 @@ app.get("/refresh", function (req, res, next) {
   );
 });
 
-app.post("/forgot", function (req, res, next) {
+app.post("/forgot", async (req, res, next) => {
   const sqlite3 = require("sqlite3").verbose();
 
   const nodemailer = require("nodemailer");
   const transporter = nodemailer.createTransport({
-    host: env.process.MAIL_HOST,
-    port: env.process.MAIL_PORT,
-    secure: env.process.MAIL_SECURE,
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
+    secure: process.env.MAIL_SECURE,
     auth: {
-      user: MAIL_AUTH_USER,
-      pass: MAIL_AUTH_PASS,
+      user: process.env.MAIL_AUTH_USER,
+      pass: process.env.MAIL_AUTH_PASS,
     },
   });
 
   var email = req.body.email;
+  var captchaToken = req.body.captcha_token || null;
   var data = {
     error: 0,
     message: "",
   };
+
+  // CHECK GOOGLE CAPTCHA by captchaToken
+  if (!captchaCheck(captchaToken)) {
+    data.error = 1;
+    data.message = "Captcha error";
+    res.send(data);
+  }
 
   var jwt = require("jsonwebtoken");
   var emailToken = jwt.sign({ email: email }, process.env.TOKEN_SECRET, {
@@ -378,17 +396,17 @@ app.post("/forgot", function (req, res, next) {
 
               const info = transporter.sendMail(
                 {
-                  from: `Dev116 <${env.process.MAIL_AUTH_USER}>`,
+                  from: `Dev116 <${process.env.MAIL_AUTH_USER}>`,
                   to: email,
                   subject: "Подтверждение сброса пароля на проекте Dev116.ru",
                   text: ``,
                   html: content,
-                  sender: env.process.MAIL_AUTH_USER,
-                  replyTo: env.process.MAIL_AUTH_USER,
+                  sender: process.env.MAIL_AUTH_USER,
+                  replyTo: process.env.MAIL_AUTH_USER,
                   dkim: {
-                    domainName: env.process.MAIL_DOMAIN_NAME,
-                    keySelector: env.process.MAIL_KEY_SELECTOR,
-                    privateKey: env.process.MAIL_PRIVATE_KEY,
+                    domainName: process.env.MAIL_DOMAIN_NAME,
+                    keySelector: process.env.MAIL_KEY_SELECTOR,
+                    privateKey: process.env.MAIL_PRIVATE_KEY,
                   },
                 },
                 function (error, info) {
@@ -414,27 +432,35 @@ app.post("/forgot", function (req, res, next) {
   );
 });
 
-app.post("/reset", function (req, res, next) {
+app.post("/reset", async (req, res, next) => {
   const sqlite3 = require("sqlite3").verbose();
 
   const nodemailer = require("nodemailer");
   const transporter = nodemailer.createTransport({
-    host: env.process.MAIL_HOST,
-    port: env.process.MAIL_PORT,
-    secure: env.process.MAIL_SECURE,
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
+    secure: process.env.MAIL_SECURE,
     auth: {
-      user: MAIL_AUTH_USER,
-      pass: MAIL_AUTH_PASS,
+      user: process.env.MAIL_AUTH_USER,
+      pass: process.env.MAIL_AUTH_PASS,
     },
   });
 
   var email = req.body.email || "";
   var token = req.body.token || "";
   var password = req.body.password || "";
+  var captchaToken = req.body.captcha_token || null;
   var data = {
     error: 0,
     message: "",
   };
+
+  // CHECK GOOGLE CAPTCHA by captchaToken
+  if (!captchaCheck(captchaToken)) {
+    data.error = 1;
+    data.message = "Captcha error";
+    res.send(data);
+  }
 
   var db = new sqlite3.Database(
     `./db/${process.env.DATABASE}.db`,
@@ -460,17 +486,17 @@ app.post("/reset", function (req, res, next) {
 
               const info = transporter.sendMail(
                 {
-                  from: `Dev116 <${env.process.MAIL_AUTH_USER}>`,
+                  from: `Dev116 <${process.env.MAIL_AUTH_USER}>`,
                   to: email,
                   subject: "Подтверждение смены пароля на проекте Dev116.ru",
                   text: ``,
                   html: content,
-                  sender: env.process.MAIL_AUTH_USER,
-                  replyTo: env.process.MAIL_AUTH_USER,
+                  sender: process.env.MAIL_AUTH_USER,
+                  replyTo: process.env.MAIL_AUTH_USER,
                   dkim: {
-                    domainName: env.process.MAIL_DOMAIN_NAME,
-                    keySelector: env.process.MAIL_KEY_SELECTOR,
-                    privateKey: env.process.MAIL_PRIVATE_KEY,
+                    domainName: process.env.MAIL_DOMAIN_NAME,
+                    keySelector: process.env.MAIL_KEY_SELECTOR,
+                    privateKey: process.env.MAIL_PRIVATE_KEY,
                   },
                 },
                 function (error, info) {
@@ -496,7 +522,7 @@ app.post("/reset", function (req, res, next) {
   );
 });
 
-app.get("/submit", function (req, res, next) {
+app.get("/submit", async (req, res, next) => {
   const sqlite3 = require("sqlite3").verbose();
 
   var data = {
@@ -525,13 +551,13 @@ app.get("/submit", function (req, res, next) {
                 data.error = 1;
                 data.message = "Ошибка подтверждения Email";
                 res.redirect(
-                  "/login?error=0&message=Ошибка%20подтверждения%20Email"
+                  "/login?error=1&message=Ошибка%20подтверждения%20Email"
                 );
               } else {
                 data.error = 0;
                 data.message = "Успешное подтверждение Email";
                 res.redirect(
-                  "/login?error=1&message=Успешное%20подтверждение%20Email"
+                  "/login?error=0&message=Успешное%20подтверждение%20Email"
                 );
               }
             }

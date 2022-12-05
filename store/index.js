@@ -47,13 +47,13 @@ export const mutations = {
 export const actions = {
   async nuxtServerInit({ dispatch }) {
     const token = this.$storage.getUniversal("token") || null;
-    const refreshToken = this.$storage.getUniversal("refresh_token") || null;
+    //const refreshToken = this.$storage.getUniversal("refresh_token") || null;
     if (token && token.length > 0) {
-      console.log(
-        "CHECK TOKENS (Main & Refresh): ",
-        jwtCheck(token),
-        jwtCheck(refreshToken)
-      );
+      // console.log(
+      //   "CHECK TOKENS (Main & Refresh): ",
+      //   jwtCheck(token),
+      //   jwtCheck(refreshToken)
+      // );
       await dispatch("autoLogin");
     }
   },

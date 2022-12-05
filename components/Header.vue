@@ -61,8 +61,6 @@
                 </nuxt-link>
             </v-btn>
 
-            {{ $store.state.loggedIn }}
-
             <div style="margin-left: 10px;">
                 <nuxt-link v-if="$i18n.locale !== 'en'" :to="switchLocalePath('en')">ENG</nuxt-link>
                 <nuxt-link v-if="$i18n.locale !== 'ru'" :to="switchLocalePath('ru')">RUS</nuxt-link>

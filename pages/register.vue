@@ -72,10 +72,15 @@ export default {
     methods: {
         async submitForm(userInfo) {
             try {
-                const r = await this.$axios.post('/auth/reg', userInfo)
+                const captchaToken = await this.$recaptcha.execute('login');
+                userInfo["captchaToken"] = captchaToken;
+
+                const r = await this.$axios.post('/auth/register', userInfo)
                     .then(response => {
+                        console.log("REG USER: ", response);
                         this.error = response.data.error;
                         this.message = response.data.message;
+                        
                         if (response.data.error == 0) {
                             console.log('Регистрация успешна!', response);
                             this.$toast.success('Регистрация успешна!');

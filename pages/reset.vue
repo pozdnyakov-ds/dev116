@@ -76,7 +76,9 @@ export default {
     methods: {
         async submitForm(userInfo) {
             try {
-                this.$axios.setHeader("Authorization", "");
+                const captchaToken = await this.$recaptcha.execute('login');
+                userInfo["captchaToken"] = captchaToken;
+                
                 const r = await this.$axios.post('/auth/reset', userInfo)
                     .then(response => {
                         this.error = response.data.error;
