@@ -7,11 +7,11 @@ export default function ({ $axios, store, redirect, app }) {
     (request) => {
       // Для токена в каждом запросе:
       // request.headers.common['Authorization'] = 'Bearer ' + token; // взять из кукесов или универсального сториджа.
-      console.info("AXIOS - Запрос: ", request);
+      //console.info("AXIOS - Запрос: ", request.url);
       return request;
     },
     (error) => {
-      console.error("AXIOS - Ошибка запроса: ", error);
+      //console.error("AXIOS - Ошибка запроса: ", error);
       return Promise.reject(error);
     }
   );
@@ -30,11 +30,11 @@ export default function ({ $axios, store, redirect, app }) {
 
   $axios.interceptors.response.use(
     (response) => {
-      console.info("AXIOS - Ответ: ", response.config);
+      //console.info("AXIOS - Ответ: ", response.config.url);
       return response;
     },
     (error) => {
-      console.error("AXIOS - Ошибка ответа: ", error);
+      //console.error("AXIOS - Ошибка ответа: ", error);
       return Promise.reject(error);
     }
   );

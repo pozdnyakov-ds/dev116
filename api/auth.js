@@ -247,7 +247,7 @@ app.post("/reg", function (req, res, next) {
   );
 });
 
-app.post("/refresh", function (req, res, next) {
+app.get("/refresh", function (req, res, next) {
   const r = req.headers.authorization || "";
   const token = r.split(" ")[1] || null;
 
@@ -259,10 +259,9 @@ app.post("/refresh", function (req, res, next) {
   try {
     var decodedData =
       jwt.verify(token, process.env.REFRESH_TOKEN_SECRET) || null;
-    //console.log("REFRESH decodedData: ", decodedData);
+    //...
   } catch (e) {
-    //console.log("REFRESH - Ошибка проверки рефреш-токена: ", e);
-    //$route.push("/login");
+    //...
   }
 
   var sqlite3 = require("sqlite3").verbose();

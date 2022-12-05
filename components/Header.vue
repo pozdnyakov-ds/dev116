@@ -30,7 +30,7 @@
             </template>
 
             <v-spacer></v-spacer>
-
+            
             <v-btn icon>
                 <v-icon>mdi-magnify</v-icon>
             </v-btn>
@@ -60,6 +60,8 @@
                     <v-icon>mdi-login</v-icon>
                 </nuxt-link>
             </v-btn>
+
+            {{ $store.state.loggedIn }}
 
             <div style="margin-left: 10px;">
                 <nuxt-link v-if="$i18n.locale !== 'en'" :to="switchLocalePath('en')">ENG</nuxt-link>

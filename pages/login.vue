@@ -90,13 +90,13 @@ export default {
 										headers: headers
 									})
 									.then((resp) => {
-									console.log("USER/AUTH", resp.data.user);	
 									var user = resp.data.user;
 
 									let scope = user.scope.split(',') || [];
 									user.scope = scope;
 									
 									// Set auth user
+									// console.log('LOGGED USER: ', user);
 									this.$store.commit('setUser', user);
 									
 									this.$toast.success('Успешный вход');

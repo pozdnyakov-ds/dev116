@@ -1,19 +1,35 @@
-import LogoutDialogVue from "~/components/LogoutDialog.vue";
+function jwtCheck(token) {
+  var jwt = require("jsonwebtoken");
+  if (!token) {
+    return false;
+  }
+  try {
+    const jwtData = jwt.decode(token);
+    const expires = jwtData.exp || 0;
+    return new Date().getTime() / 1000 < expires;
+  } catch (e) {
+    return false;
+  }
+}
 
 export const state = () => ({
   user: null,
-  token: null,
   loggedIn: false,
 });
 
 export const mutations = {
   setUser(state, user) {
-    console.log("setUser data: ", user);
-    state.user = user;
+    let tempUser = user;
+    if (!Array.isArray(user.scope)) {
+      let scope = user.scope.split(",") || [];
+      tempUser.scope = scope;
+    }
+
+    state.user = tempUser;
     state.loggedIn = true;
+
     this.$storage.setUniversal("token", user.token);
     this.$storage.setUniversal("refresh_token", user.refresh_token);
-    console.log("STATE User: ", state.user);
   },
 
   setUserPhoto(state, photo) {
@@ -23,23 +39,32 @@ export const mutations = {
   logout(state) {
     this.$storage.removeUniversal("token");
     this.$storage.removeUniversal("refresh_token");
-    this.loggedIn = false;
-    this.user = null;
+    state.loggedIn = false;
+    state.user = null;
   },
 };
 
 export const actions = {
   async nuxtServerInit({ dispatch }) {
-    await dispatch("autoLogin");
+    const token = this.$storage.getUniversal("token") || null;
+    const refreshToken = this.$storage.getUniversal("refresh_token") || null;
+    if (token && token.length > 0) {
+      console.log(
+        "CHECK TOKENS (Main & Refresh): ",
+        jwtCheck(token),
+        jwtCheck(refreshToken)
+      );
+      await dispatch("autoLogin");
+    }
   },
 
   async autoLogin({ commit, dispatch }) {
-    const loggedIn = this.getters.getLoggedIn;
     const token = this.$storage.getUniversal("token")
       ? this.$storage.getUniversal("token")
       : null;
 
-    if (loggedIn && token) {
+    console.info("START AUTOLOGIN...");
+    if (token && jwtCheck(token)) {
       try {
         const headers = {
           Authorization: "Bearer " + token,
@@ -50,15 +75,21 @@ export const actions = {
           })
           .then((resp) => {
             var user = resp.data.user;
-            if (user) commit("setUser", user);
+            console.info("MAIN TOKEN USER: ", user);
+
+            if (user) {
+              commit("setUser", user);
+            } else {
+              dispatch("refreshToken");
+            }
           });
       } catch (e) {
+        console.error("MAIN TOKEN EXPIRE!");
         await dispatch("refreshToken");
-        console.log("Токен обновлен: ", this.getters.getLoggedIn);
       }
     } else {
+      console.error("MAIN TOKEN EXPIRE OR NOT EXIST!");
       await dispatch("refreshToken");
-      console.log("Токен обновлен: ", this.getters.getLoggedIn);
     }
   },
 
@@ -67,24 +98,23 @@ export const actions = {
       ? this.$storage.getUniversal("refresh_token")
       : null;
 
+    console.info("START AUTO REFRESH...");
     try {
-      if (refreshToken) {
+      if (refreshToken && jwtCheck(refreshToken)) {
         const headers = {
           Authorization: "Bearer " + refreshToken,
         };
-        await this.$axios
-          .post(process.env.BASE_URL + "/api/auth/refresh", {
+        let resp = await this.$axios.get(
+          process.env.BASE_URL + "/api/auth/refresh",
+          {
             headers: headers,
-          })
-          .then((resp) => {
-            var userData = resp.data.user;
-            if (userData && userData.token) {
-              const scope = userData.scope.split(",");
-              userData.scope = scope;
-              commit("setUser", userData);
-              console.log("Токен обновлен: ", this.getters.getLoggedIn);
-            }
-          });
+          }
+        );
+        var userData = resp.data.user;
+        if (userData && userData.token) {
+          // console.info("REFRESH TOKEN USER: ", userData);
+          commit("setUser", userData);
+        }
       } else {
         console.log("Нет сохраненного Refresh-токена");
       }

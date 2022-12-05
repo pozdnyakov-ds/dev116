@@ -30,15 +30,12 @@ app.use(cors({ origin: [BASE_URL] }));
 app.get("/auth", function (req, res, next) {
   const r = req.headers.authorization || "";
   const token = r.split(" ")[1] || null;
-  console.log("AUTH TOKEN: ", token);
 
   var jwt = require("jsonwebtoken");
   try {
-    var decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-    //console.log("decodedData: ", decodedData);
+    var decodedData = jwt.verify(token, process.env.TOKEN_SECRET);
   } catch (e) {
-    console.log("Token verify error: ", e.response.data);
-    this.$store.commit("logout");
+    // return res.status(200).send({ user: null });
   }
 
   const sqlite3 = require("sqlite3").verbose();
@@ -50,7 +47,6 @@ app.get("/auth", function (req, res, next) {
       if (e) {
         //console.error(`Ошибка соединения с БД`, e.message);
       }
-
       db.get(
         "SELECT id, name, surname, email, password, photo, scope, token, refresh_token, status FROM users WHERE token=?",
         [token],
