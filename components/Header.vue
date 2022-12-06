@@ -35,7 +35,7 @@
                 <v-icon>mdi-magnify</v-icon>
             </v-btn>
 
-            <v-btn icon v-if="$store.state.loggedIn">
+            <v-btn icon v-if="isAdmin">
                 <nuxt-link to="/admin">
                     <v-icon>mdi-lock</v-icon>
                 </nuxt-link>
@@ -157,6 +157,12 @@ export default {
                 ? '/avatars/' + this.$store.state.user.photo
                 : "/img/user/no-photo.png";
             return photo;
+        },
+        isAdmin() { 
+            const valid = this.$store.state.user &&
+                this.$store.state.user.scope &&
+                Array.isArray(this.$store.state.user.scope) ? this.$store.state.user.scope : []
+            return valid.includes("admin")
         }
     }
 }

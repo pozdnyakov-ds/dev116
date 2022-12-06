@@ -1,17 +1,41 @@
 import https from "https";
 
+function jwtCheck(token) {
+  var jwt = require("jsonwebtoken");
+  if (!token) {
+    return false;
+  }
+  try {
+    const jwtData = jwt.decode(token);
+    const expires = jwtData.exp || 0;
+    return new Date().getTime() / 1000 < expires;
+  } catch (e) {
+    return false;
+  }
+}
+
 export default function ({ $axios, store, redirect, app }) {
   $axios.defaults.httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
   $axios.interceptors.request.use(
     (request) => {
-      // Для токена в каждом запросе:
-      // request.headers.common['Authorization'] = 'Bearer ' + token; // взять из кукесов или универсального сториджа.
-      //console.info("AXIOS - Запрос: ", request.url);
+      // Автообновление токена
+      if (
+        request.headers &&
+        request.headers.Authorization &&
+        request.headers.Authorization.length > 0
+      ) {
+        const token = request.headers.Authorization.split(" ")[1] || "";
+        if (!jwtCheck(token)) {
+          store.dispatch("refreshToken");
+          const token = store.state.user.token || "";
+          request.headers.Authorization = "Bearer " + token;
+        }
+      }
       return request;
     },
     (error) => {
-      //console.error("AXIOS - Ошибка запроса: ", error);
+      console.error("AXIOS - Ошибка запроса: ", error);
       return Promise.reject(error);
     }
   );

@@ -75,7 +75,7 @@ export const actions = {
           })
           .then((resp) => {
             var user = resp.data.user;
-            console.info("MAIN TOKEN USER: ", user);
+            //console.info("MAIN TOKEN USER: ", user);
 
             if (user) {
               commit("setUser", user);
