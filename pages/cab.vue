@@ -103,29 +103,28 @@ export default {
         // }),
         async submitForm(user) {
             // Обновить токен
-            this.$store.dispatch('refreshToken').then(((result) => { 
-                const t = this.$storage.getUniversal('token') || null;  
-                user.token = t;
+            
+            const t = this.$storage.getUniversal('token') || null;  
+            user.token = t;
 
-                const r = this.$axios.post('users/cab', user)
-                    .then(response => {
-                        this.error = response.data.error;
-                        this.message = response.data.message;
-                        console.log("MESSAGE FROM API: ", response.data);
+            const r = this.$axios.post('users/cab', user)
+                .then(response => {
+                    this.error = response.data.error;
+                    this.message = response.data.message;
+                    console.log("MESSAGE FROM API: ", response.data);
 
-                        if (response.data.error == 0) {
-                            this.$toast.success('Пользователь обновлен');
-                            //this.$router.push('/cab');
-                        } else {
-                            this.$toast.error('Ошибка обновления пользователя');
-                            //this.$router.push('/cab');
-                        }
-                    })
-                    .catch(e => {
+                    if (response.data.error == 0) {
+                        this.$toast.success('Пользователь обновлен');
+                        //this.$router.push('/cab');
+                    } else {
                         this.$toast.error('Ошибка обновления пользователя');
                         //this.$router.push('/cab');
-                    });
-            }));
+                    }
+                })
+                .catch(e => {
+                    this.$toast.error('Ошибка обновления пользователя');
+                    //this.$router.push('/cab');
+                });
         }
     },
     middleware: 'auth/user',
@@ -139,8 +138,10 @@ export default {
             }
         },
     },
-    mounted() {
+    async mounted() {
         //this.$validator.validate();
+        const r = await this.$axios.get('card/users');
+        console.log("CARD DATA: ", r)
     }
 }    
 </script>

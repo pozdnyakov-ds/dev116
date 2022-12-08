@@ -196,5 +196,6 @@ export default {
     { path: "/api", handler: "~/api/index.js" },
     { path: "/api/auth", handler: "~/api/auth.js" },
     { path: "/api/users", handler: "~/api/users.js" },
+    { path: "/api/card", handler: "~/api/card.js" },
   ],
 };
