@@ -1,19 +1,12 @@
-const mysql = require("mysql");
+const mysql = require("mysql2");
 
-var connection = mysql.createConnection({
-  host: "192.168.0.115:3306", //172.17.0.3
+const pool = mysql.createPool({
+  connectionLimit: 5,
+  host: "10.15.6.28",
+  port: "3306",
   user: "dimon",
   password: "123qweASD",
-  database: "dev116",
-  insecureAuth: true,
+  database: "sakhalin"
 });
 
-// connection.connect((err) => {
-//   if (err) {
-//     console.error("Error connection: ", err);
-//   } else {
-//     console.log("Успешное соединение с БД");
-//   }
-// });
-
-module.exports = connection;
+module.exports = pool;

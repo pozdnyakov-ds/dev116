@@ -25,32 +25,15 @@ var cors = require("cors");
 app.use(cors({ origin: [BASE_URL] }));
 
 app.get("/users", async (req, res, next) => {
-  var connection = require("../db/mysql.js");
-  const [results] = await connection.execute("select * from users where 1");
-  console.log("results:", results);
-  //   var database = {};
+  var pool = require("../db/mysql.js");
 
-  //   database.executeQuery = function (query, values, callback) {
-  //     connection.query(query, values, function (err, rows, fields) {
-  //       if (!err) {
-  //         callback(null, rows, fields);
-  //         res.send({ user: rows });
-  //       } else {
-  //         callback(err);
-  //       }
-  //     });
+  pool.query("SELECT * FROM okved", function(err, data) {
+    if(err) return console.log("Error: ", err);
+    res.send({
+        users: data
+    });
+  });
 
-  // connection.query(
-  //     "select * from users where 1",
-  //     function (error, results, fields) {
-  //         console.log("Error ->> ", error);
-  //         console.log("Results ->> ", results);
-  //         console.log("Fields ->> ", fields);
-
-  //         res.send({ user: results });
-  //     }
-  // );
-  //   };
 });
 
 export default {
