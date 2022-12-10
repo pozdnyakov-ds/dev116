@@ -27,13 +27,12 @@ app.use(cors({ origin: [BASE_URL] }));
 app.get("/users", async (req, res, next) => {
   var pool = require("../db/mysql.js");
 
-  pool.query("SELECT * FROM okved", function(err, data) {
-    if(err) return console.log("Error: ", err);
+  pool.query("SELECT * FROM users", function (err, data) {
+    if (err) return console.log("Error: ", err);
     res.send({
-        users: data
+      users: data,
     });
   });
-
 });
 
 export default {
