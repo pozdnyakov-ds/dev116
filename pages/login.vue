@@ -49,7 +49,7 @@ export default {
 			valid: false,
 			error: 0,
 			message: '',
-			messageColor: "#333",
+			messageStyle: "#333",
 			showPassword: false,
 			required(propertyType) {
 				return v => v && v.length > 0 || `Нужно указать ${propertyType}`
