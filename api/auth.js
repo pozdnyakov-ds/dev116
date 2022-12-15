@@ -1,4 +1,4 @@
-import { $fetch } from "ohmyfetch/node";
+import { $fetch } from "ohmyfetch";
 
 async function captchaCheck(token) {
   if (!token) {
